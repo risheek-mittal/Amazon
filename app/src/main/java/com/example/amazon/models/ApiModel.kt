@@ -7,7 +7,12 @@ class ApiModel {
     var title: String? = null
     var brand: String? = null
     var category: String? = null
-    var images: Product? = null
+//    var images: Product? = null
+    var thumbnail: String?= null
+    var price: Int?=null
+    var stock: Int?=null
+    var discountPercentage: Float?=null
+    var rate: Float?=null
 }
 
 class Product {

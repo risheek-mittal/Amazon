@@ -3,13 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".tab_fragments.HomeFragment">
 
    <com.jackandphantom.carouselrecyclerview.CarouselRecyclerview
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
        android:id="@+id/carouselRecyclerView"
-       android:layout_margin="50dp"
        />
 
 </FrameLayout>
