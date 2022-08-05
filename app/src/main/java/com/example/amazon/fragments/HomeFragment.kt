@@ -38,6 +38,7 @@ class HomeFragment : Fragment() {
 //        imageArray.add(R.drawable.two)
 //        imageArray.add(R.drawable.three)
 //        imageArray.add(R.drawable.four)
+        requireActivity().setTitle("Home")
         val view = inflater.inflate(R.layout.fragment_home, container, false)
 
         val tabLayout=view.findViewById<TabLayout>(R.id.tabLayout)
@@ -51,14 +52,13 @@ class HomeFragment : Fragment() {
         TabLayoutMediator(tabLayout, viewPager2){tab, position->
             when(position){
                 0->{
-                    tab.text="First"
+                    tab.text="Home"
                 }
                 1->{
-                    tab.text="Two"
+                    tab.text="Items"
                 }
             }
         }.attach()
-
 
 //        carouselView2 = carouselView
 //        carouselView2!!.pageCount = imageArray.size

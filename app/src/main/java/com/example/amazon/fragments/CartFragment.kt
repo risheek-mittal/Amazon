@@ -1,60 +1,131 @@
 package com.example.amazon.fragments
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.amazon.database.DBHelper
 import com.example.amazon.R
+import com.example.amazon.adapter.CartAdapter
+import com.example.amazon.models.CartModel
+import kotlinx.android.synthetic.main.fragment_cart.view.*
+import kotlin.collections.ArrayList
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [CartFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class CartFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+
+    private lateinit var cartTitleList : ArrayList<String>
+    private lateinit var cartPriceList : ArrayList<String>
+    private lateinit var cartQuantityList : ArrayList<String>
+    lateinit var adapter: CartAdapter
+//    lateinit var product: ArrayList<CartModel>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+
     }
 
+    @SuppressLint("Range")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_cart, container, false)
+        val view = inflater.inflate(R.layout.fragment_cart, container, false)
+        val thisContext = container!!.context
+        val textViewText = requireActivity()!!.getSharedPreferences("shopping_cart", Context.MODE_PRIVATE)
+            .getString("cart_latest_item", "default value")
+//        view.cartTextView.text = textViewText
+
+        val prefs: SharedPreferences = requireActivity()!!.getSharedPreferences("PACKAGE", Context.MODE_PRIVATE)
+        val serialized = prefs.getString("phrases", "Brian")
+        var listOfFavoritePhrases = ArrayList<String>(listOf(TextUtils.split(serialized, ",").toString()))
+        var totalPrice = 0
+
+//        printName.setOnClickListener {
+
+            // creating a DBHelper class
+            // and passing context to it
+            val db = DBHelper(thisContext, null)
+
+            // below is the variable for cursor
+            // we have called method to get
+            // all names from our database
+            // and add to name text view
+            val cursor = db.getName()
+
+            // moving the cursor to first position and
+            // appending value in the text view
+            cursor!!.moveToFirst()
+            if(cursor.count>0){
+                cartTitleList = arrayListOf<String>()
+                cartPriceList = arrayListOf<String>()
+                cartQuantityList = arrayListOf<String>()
+                cartTitleList.add(cursor.getString(cursor.getColumnIndex(DBHelper.TITLE_COL)))
+                cartPriceList.add(cursor.getString(cursor.getColumnIndex(DBHelper.PRICE_COL)))
+                cartQuantityList.add(cursor.getString(cursor.getColumnIndex(DBHelper.QUANTITY_COL)))
+//        print("ajcajcds")
+//        print("cart list: $cartTitleList")
+
+//        var cartTextView = view.findViewById<TextView>(R.id.cartTitleView)
+//            cartTextView.append(cursor.getString(cursor.getColumnIndex(DBHelper.NAME_COl)) + "\n")
+//            view.cartPriceView.append(cursor.getString(cursor.getColumnIndex(DBHelper.AGE_COL)) + "\n")
+
+                // moving our cursor to next
+                // position and appending values
+                while (cursor.moveToNext()) {
+                    cartTitleList.add(cursor.getString(cursor.getColumnIndex(DBHelper.TITLE_COL)))
+                    cartPriceList.add(cursor.getString(cursor.getColumnIndex(DBHelper.PRICE_COL)))
+                    cartQuantityList.add(cursor.getString(cursor.getColumnIndex(DBHelper.QUANTITY_COL)))
+//                cartTextView.append(cursor.getString(cursor.getColumnIndex(DBHelper.NAME_COl)) + "\n")
+//                view.cartPriceView.append(cursor.getString(cursor.getColumnIndex(DBHelper.AGE_COL)) + "\n")
+
+                }
+                println(cartTitleList.groupingBy { it }.eachCount().filter { it.value > 1 })
+                val product = ArrayList<CartModel>()
+//        product.add(CartModel("abcd"))
+                for (i in 0..(cartTitleList.size - 1)) {
+//                var quantity = Collections.frequency(cartTitleList, item)
+
+                    totalPrice =
+                        totalPrice + (cartPriceList[i].toInt() * cartQuantityList[i].toInt())
+
+                    product.add(
+                        CartModel(
+                            cartTitleList[i],
+                            cartQuantityList[i].toInt(),
+                            cartPriceList[i],
+                            totalPrice
+                        )
+                    )
+//            cartTextView.append(item + ": " + Collections.frequency(cartTitleList, item) + "\n")
+                }
+                Log.d("Print", cartTitleList.toString())
+
+                // at last we close our cursor
+                cursor.close()
+//        view.deleteButton.setOnClickListener {
+//            db.onDelete("iPhone X")
+//        }
+                adapter = CartAdapter(thisContext, product)
+                view.cartRecyclerView.adapter = adapter
+                view.cartTotal.text = "Cart Value: $$totalPrice"
+                view.cartRecyclerView.layoutManager = LinearLayoutManager(thisContext)
+            }
+        else{
+            view.cartTotal.text=="$0"
+            }
+
+        return view
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment CartFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            CartFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    fun setCartTotal(view: View, totalPrice: String){
+        view.cartTotal.text = "Cart Value: $$totalPrice"
     }
 }

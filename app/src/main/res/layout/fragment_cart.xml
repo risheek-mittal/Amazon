@@ -3,14 +3,38 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".fragments.CartFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Cart"
-        android:gravity="center"
-        android:textSize="26dp"/>
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/cartTotal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="20dp"
+            android:layout_marginLeft="50dp"
+            style="@style/TextAppearance.AppCompat.Headline"
+            android:text="Subtotal: $0" />
+    <Button
+        android:id="@+id/checkoutButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="50dp"
+        android:text="CheckOut" />
+
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/cartRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:listitem="@layout/cart_layout">
+
+
+    </androidx.recyclerview.widget.RecyclerView>
+    </LinearLayout>
 
 </FrameLayout>
